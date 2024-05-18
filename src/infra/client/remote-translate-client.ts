@@ -27,9 +27,6 @@ export class RemoteTranslateClient implements RemoteTranslate {
     params: GenerateTranslationParams
   ): Promise<string> {
     return new Promise((resolve, reject) => {
-      if (!params.text) return reject("Invalid text parameter");
-      if (!params.source) return reject("Invalid source value");
-      if (!params.target) return reject("Invalid target value");
       this.awsTranslate.translateText(
         this.generateTranslationParams(params),
         (error, result) => {
