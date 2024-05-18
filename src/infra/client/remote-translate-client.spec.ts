@@ -1,23 +1,23 @@
-import AWS from "aws-sdk";
+import {
+  TranslateClient,
+  TranslateTextCommand,
+  TranslateTextRequest,
+  TranslateTextResponse,
+} from "@aws-sdk/client-translate";
 
 import { RemoteTranslateClient } from "./remote-translate-client";
 
-jest.mock("aws-sdk", () => {
-  const mockTranslate = {
-    translateText: jest.fn(),
-  };
-  return {
-    Translate: jest.fn(() => mockTranslate),
-  };
-});
+jest.mock("@aws-sdk/client-translate");
 
-const mockTranslateInstance = new AWS.Translate();
+const mockTranslateClient = new TranslateClient({});
+const sendMock = jest.fn();
+mockTranslateClient.send = sendMock;
 
 describe("RemoteTranslateClient", () => {
   let remoteTranslateClient: RemoteTranslateClient;
 
   beforeEach(() => {
-    remoteTranslateClient = new RemoteTranslateClient(mockTranslateInstance);
+    remoteTranslateClient = new RemoteTranslateClient(mockTranslateClient);
   });
 
   describe("translate", () => {
@@ -26,24 +26,15 @@ describe("RemoteTranslateClient", () => {
         content: ["Hello"],
         language: { source: "en", target: ["es"] },
       };
-      const awsResponse = { TranslatedText: "Hola" };
-      (mockTranslateInstance.translateText as jest.Mock).mockImplementation(
-        (params, callback) => {
-          callback(null, awsResponse);
-        }
-      );
+      const awsResponse: TranslateTextResponse = {
+        TranslatedText: "Hola",
+      } as any;
+      sendMock.mockResolvedValue(awsResponse);
 
       const result = await remoteTranslateClient.translate(params);
 
       expect(result).toEqual([{ language: "es", content: ["Hola"] }]);
-      expect(mockTranslateInstance.translateText).toHaveBeenCalledWith(
-        {
-          Text: "Hello",
-          SourceLanguageCode: "en",
-          TargetLanguageCode: "es",
-        },
-        expect.any(Function)
-      );
+      expect(sendMock).toHaveBeenCalledWith(expect.any(TranslateTextCommand));
     });
 
     it("should handle errors from AWS Translate", async () => {
@@ -52,11 +43,7 @@ describe("RemoteTranslateClient", () => {
         language: { source: "en", target: ["es"] },
       };
       const awsError = new Error("AWS Translate error");
-      (mockTranslateInstance.translateText as jest.Mock).mockImplementation(
-        (params, callback) => {
-          callback(awsError, null);
-        }
-      );
+      sendMock.mockRejectedValue(awsError);
 
       await expect(remoteTranslateClient.translate(params)).rejects.toThrow(
         "AWS Translate error"
@@ -67,30 +54,40 @@ describe("RemoteTranslateClient", () => {
   describe("translateUsingAWS", () => {
     it("should return translated text", async () => {
       const params = { text: "Hello", source: "en", target: "es" };
-      const awsResponse = { TranslatedText: "Hola" };
-      (mockTranslateInstance.translateText as jest.Mock).mockImplementation(
-        (params, callback) => {
-          callback(null, awsResponse);
-        }
-      );
+      const awsResponse: TranslateTextResponse = {
+        TranslatedText: "Hola",
+      } as any;
+      sendMock.mockResolvedValue(awsResponse);
 
       const result = await remoteTranslateClient["translateUsingAWS"](params);
 
       expect(result).toBe("Hola");
+      expect(sendMock).toHaveBeenCalledWith(expect.any(TranslateTextCommand));
     });
 
     it("should handle errors from AWS Translate", async () => {
       const params = { text: "Hello", source: "en", target: "es" };
       const awsError = new Error("AWS Translate error");
-      (mockTranslateInstance.translateText as jest.Mock).mockImplementation(
-        (params, callback) => {
-          callback(awsError, null);
-        }
-      );
+      sendMock.mockRejectedValue(awsError);
 
       await expect(
         remoteTranslateClient["translateUsingAWS"](params)
       ).rejects.toThrow("AWS Translate error");
+    });
+  });
+
+  describe("generateTranslationParams", () => {
+    it("should generate translation parameters correctly", () => {
+      const params = { text: "Hello", source: "en", target: "es" };
+      const expected: TranslateTextRequest = {
+        Text: "Hello",
+        SourceLanguageCode: "en",
+        TargetLanguageCode: "es",
+      };
+
+      const result = remoteTranslateClient["generateTranslationParams"](params);
+
+      expect(result).toEqual(expected);
     });
   });
 });

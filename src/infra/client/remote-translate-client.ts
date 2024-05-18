@@ -1,9 +1,12 @@
 import { RemoteTranslate } from "@/data/protocols/remote";
-
-import AWS from "aws-sdk";
+import {
+  TranslateClient,
+  TranslateTextCommand,
+  TranslateTextRequest,
+} from "@aws-sdk/client-translate";
 
 export class RemoteTranslateClient implements RemoteTranslate {
-  constructor(private readonly awsTranslate: AWS.Translate) {}
+  constructor(private readonly awsTranslateClient: TranslateClient) {}
 
   public async translate({
     content,
@@ -26,18 +29,15 @@ export class RemoteTranslateClient implements RemoteTranslate {
   private async translateUsingAWS(
     params: GenerateTranslationParams
   ): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this.awsTranslate.translateText(
-        this.generateTranslationParams(params),
-        (error, result) => {
-          if (error) reject(error);
-          return resolve(result.TranslatedText);
-        }
-      );
-    });
+    const input = this.generateTranslationParams(params);
+    const command = new TranslateTextCommand(input);
+    const { TranslatedText } = await this.awsTranslateClient.send(command);
+    return TranslatedText as string;
   }
 
-  private generateTranslationParams(params: GenerateTranslationParams) {
+  private generateTranslationParams(
+    params: GenerateTranslationParams
+  ): TranslateTextRequest {
     return {
       Text: params.text,
       TargetLanguageCode: params.target,
