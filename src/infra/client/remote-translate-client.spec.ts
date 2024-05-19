@@ -33,7 +33,7 @@ describe("RemoteTranslateClient", () => {
 
       const result = await remoteTranslateClient.translate(params);
 
-      expect(result).toEqual([{ language: "es", content: ["Hola"] }]);
+      expect(result).toEqual([{ language: "es", content: { Hello: "Hola" } }]);
       expect(sendMock).toHaveBeenCalledWith(expect.any(TranslateTextCommand));
     });
 

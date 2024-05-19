@@ -6,6 +6,6 @@ export namespace TranslateJSON {
 
   export type Response = {
     language: string;
-    content: string[];
+    content: Record<string, string>;
   }[];
 }

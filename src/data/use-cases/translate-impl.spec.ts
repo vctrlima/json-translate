@@ -22,8 +22,14 @@ describe("TranslateImpl", () => {
       language: { source: "en", target: ["es", "pt"] },
     };
     const translation: RemoteTranslate.Response = [
-      { content: [faker.word.words()], language: "es" },
-      { content: [faker.word.words()], language: "pt" },
+      {
+        content: { [faker.word.words()]: faker.word.words() },
+        language: "es",
+      },
+      {
+        content: { [faker.word.words()]: faker.word.words() },
+        language: "pt",
+      },
     ];
     jest
       .spyOn(remoteTranslateClient, "translate")

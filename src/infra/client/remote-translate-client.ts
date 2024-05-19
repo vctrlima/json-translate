@@ -15,11 +15,12 @@ export class RemoteTranslateClient implements RemoteTranslate {
     let response: RemoteTranslate.Response = [];
     const { source } = language;
     for (let target of language.target) {
-      let translation: Translation = { language: target, content: [] };
+      let translation: Translation = { language: target, content: {} };
       for (let text of content) {
         const params = { text, source, target };
         const result = await this.translateUsingAWS(params);
-        translation.content.push(result as string);
+        const { content } = translation;
+        translation.content = { ...content, [text]: result as string };
       }
       response.push(translation);
     }
@@ -54,5 +55,5 @@ interface GenerateTranslationParams {
 
 interface Translation {
   language: string;
-  content: string[];
+  content: Record<string, string>;
 }
