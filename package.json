@@ -9,7 +9,13 @@
     "test:watch": "jest --coverage --watch"
   },
   "author": "Victor Lima",
-  "license": "ISC",
+  "license": "MIT",
+  "description": "This Node.js application uses the AWS Translate Service to generate translated text.",
+  "keywords": [
+    "aws",
+    "translate",
+    "node"
+  ],
   "dependencies": {
     "@aws-sdk/client-translate": "^3.577.0",
     "dotenv": "^16.4.5",

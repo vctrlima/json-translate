@@ -1,0 +1,39 @@
+{
+	"info": {
+		"_postman_id": "3428f304-6067-49d8-8532-ccbb6ec91283",
+		"name": "json-translate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29362736"
+	},
+	"item": [
+		{
+			"name": "translate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"content\": [\n        \"Hello, desenvolvedor! Como está seu dia?\",\n        \"Traduções em tempo real\",\n        \"Utilizando o AWS Translate!\"\n    ],\n    \"language\": {\n        \"source\": \"pt\",\n        \"target\": [\n            \"en\",\n            \"es\",\n            \"zh\",\n            \"ja\"\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/translate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"translate"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
