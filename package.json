@@ -11,7 +11,6 @@
   "author": "Victor Lima",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.577.0",
     "@aws-sdk/client-translate": "^3.577.0",
     "dotenv": "^16.4.5",
     "fastify": "^4.27.0",
